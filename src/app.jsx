@@ -14,7 +14,7 @@ function App() {
     formData.append("scale", scale);
     formData.append("quality", quality);
 
-    const res = await fetch("https://your-backend-url/convert", {
+    const res = await fetch("https://image-converter-bot.onrender.com", {
       method: "POST",
       body: formData,
     });
