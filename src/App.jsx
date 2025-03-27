@@ -14,7 +14,7 @@ function App() {
     formData.append("scale", scale);
     formData.append("quality", quality);
 
-    const res = await fetch("https://convert3.onrender.com", {
+    const res = await fetch("https://convert3.onrender.com/convert", {
       method: "POST",
       body: formData,
     });
