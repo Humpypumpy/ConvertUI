@@ -1,60 +1,97 @@
-import { useState } from "react";
+import { useState, useEffect } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import UploadScreen from './components/UploadScreen';
+import SelectFormatScreen from './components/SelectFormatScreen';
+import ConvertScreen from './components/ConvertScreen';
+import ResultScreen from './components/ResultScreen';
 
-function App() {
+const transitionProps = {
+  initial: { opacity: 0, y: 30 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -30 },
+  transition: { duration: 0.4, ease: 'easeInOut' },
+};
+
+export default function App() {
+  const [step, setStep] = useState('upload');
+  const [isDark, setIsDark] = useState(false);
   const [file, setFile] = useState(null);
-  const [format, setFormat] = useState("png");
-  const [scale, setScale] = useState(100);
-  const [quality, setQuality] = useState(90);
+  const [inputFormat, setInputFormat] = useState('JPG');
+  const [outputFormat, setOutputFormat] = useState('PNG');
   const [convertedUrl, setConvertedUrl] = useState(null);
 
-  const handleConvert = async () => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("format", format);
-    formData.append("scale", scale);
-    formData.append("quality", quality);
-
-    const res = await fetch("https://convert3.onrender.com/convert", {
-      method: "POST",
-      body: formData,
-    });
-
-    const blob = await res.blob();
-    setConvertedUrl(URL.createObjectURL(blob));
-  };
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDark);
+  }, [isDark]);
 
   return (
-    <div className="p-4 max-w-md mx-auto">
-      <h1 className="text-xl font-bold mb-4">Telegram Image Converter</h1>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-white dark:from-gray-900 dark:to-black text-gray-900 dark:text-white px-6 py-8 flex flex-col items-center relative overflow-hidden">
+      {/* Header + Dark Mode Toggle */}
+      <div className="absolute top-4 right-4">
+        <button
+          onClick={() => setIsDark(!isDark)}
+          className="p-2 rounded-lg bg-white/90 text-indigo-600 dark:bg-gray-800/90 dark:text-teal-300 shadow-lg hover:scale-110 transition-transform duration-200"
+        >
+          {isDark ? '☀️' : '🌙'}
+        </button>
+      </div>
 
-      <input type="file" accept="image/*" onChange={(e) => setFile(e.target.files[0])} className="mb-4" />
+      <h1 className="text-4xl font-extrabold text-center tracking-tight leading-tight mt-6 text-indigo-700 dark:text-teal-300">
+        Telegram Image Converter
+      </h1>
+      <p className="text-lg font-medium text-indigo-500 dark:text-teal-200 mt-1">
+        Simple. Fast. Modern.
+      </p>
 
-      <label>Format:</label>
-      <select value={format} onChange={(e) => setFormat(e.target.value)} className="mb-4 w-full">
-        <option value="png">PNG</option>
-        <option value="jpeg">JPEG</option>
-        <option value="webp">WEBP</option>
-        <option value="tiff">TIFF</option>
-        <option value="avif">AVIF</option>
-        <option value="ico">ICO</option>
-      </select>
+      <div className="mt-10 w-full max-w-md flex flex-col items-center">
+        <AnimatePresence mode="wait">
+          {step === 'upload' && (
+            <motion.div key="upload" {...transitionProps} className="w-full">
+              <UploadScreen
+                setStep={setStep}
+                setFile={setFile}
+              />
+            </motion.div>
+          )}
 
-      <label>Resize (%): {scale}</label>
-      <input type="range" min="25" max="100" step="5" value={scale} onChange={(e) => setScale(e.target.value)} className="mb-4 w-full" />
+          {step === 'select' && (
+            <motion.div key="select" {...transitionProps} className="w-full">
+              <SelectFormatScreen
+                inputFormat={inputFormat}
+                outputFormat={outputFormat}
+                setInputFormat={setInputFormat}
+                setOutputFormat={setOutputFormat}
+                setStep={setStep}
+              />
+            </motion.div>
+          )}
 
-      <label>Quality (%): {quality}</label>
-      <input type="range" min="10" max="100" step="10" value={quality} onChange={(e) => setQuality(e.target.value)} className="mb-4 w-full" />
+          {step === 'convert' && (
+            <motion.div key="convert" {...transitionProps} className="w-full">
+              <ConvertScreen
+                file={file}
+                inputFormat={inputFormat}
+                outputFormat={outputFormat}
+                setConvertedUrl={setConvertedUrl}
+                setStep={setStep}
+              />
+            </motion.div>
+          )}
 
-      <button onClick={handleConvert} className="bg-blue-600 text-white px-4 py-2 rounded">Convert Image</button>
+          {step === 'result' && (
+            <motion.div key="result" {...transitionProps} className="w-full">
+              <ResultScreen
+                convertedUrl={convertedUrl}
+                setStep={setStep}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
-      {convertedUrl && (
-        <div className="mt-4">
-          <h2 className="mb-2">Converted Image:</h2>
-          <a href={convertedUrl} download="converted_image" className="text-blue-500 underline">Download</a>
-        </div>
-      )}
+      <p className="mt-auto text-sm text-indigo-400 dark:text-teal-300 pt-8 font-medium">
+        Built with ❤️ for Telegram Mini Apps
+      </p>
     </div>
   );
 }
-
-export default App;
