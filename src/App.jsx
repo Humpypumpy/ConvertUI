@@ -1,9 +1,13 @@
 import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import UploadScreen from './components/UploadScreen';
-import SelectFormatScreen from './components/SelectFormatScreen';
-import ConvertScreen from './components/ConvertScreen';
-import ResultScreen from './components/ResultScreen';
+
+// ✅ Importing all 6 components
+import UploadSection from './components/UploadSection';
+import FormatSelection from './components/FormatSelection';
+import ConversionProgress from './components/ConversionProgress';
+import ResultDisplay from './components/ResultDisplay';
+import DarkModeToggle from './components/DarkModeToggle';
+import Header from './components/Header';
 
 const transitionProps = {
   initial: { opacity: 0, y: 30 },
@@ -26,37 +30,24 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-white dark:from-gray-900 dark:to-black text-gray-900 dark:text-white px-6 py-8 flex flex-col items-center relative overflow-hidden">
-      {/* Header + Dark Mode Toggle */}
-      <div className="absolute top-4 right-4">
-        <button
-          onClick={() => setIsDark(!isDark)}
-          className="p-2 rounded-lg bg-white/90 text-indigo-600 dark:bg-gray-800/90 dark:text-teal-300 shadow-lg hover:scale-110 transition-transform duration-200"
-        >
-          {isDark ? '☀️' : '🌙'}
-        </button>
-      </div>
+      
+      {/* ✅ Dark Mode Button */}
+      <DarkModeToggle isDark={isDark} setIsDark={setIsDark} />
 
-      <h1 className="text-4xl font-extrabold text-center tracking-tight leading-tight mt-6 text-indigo-700 dark:text-teal-300">
-        Telegram Image Converter
-      </h1>
-      <p className="text-lg font-medium text-indigo-500 dark:text-teal-200 mt-1">
-        Simple. Fast. Modern.
-      </p>
+      {/* ✅ App Title/Header */}
+      <Header />
 
       <div className="mt-10 w-full max-w-md flex flex-col items-center">
         <AnimatePresence mode="wait">
           {step === 'upload' && (
             <motion.div key="upload" {...transitionProps} className="w-full">
-              <UploadScreen
-                setStep={setStep}
-                setFile={setFile}
-              />
+              <UploadSection setStep={setStep} setFile={setFile} />
             </motion.div>
           )}
 
           {step === 'select' && (
             <motion.div key="select" {...transitionProps} className="w-full">
-              <SelectFormatScreen
+              <FormatSelection
                 inputFormat={inputFormat}
                 outputFormat={outputFormat}
                 setInputFormat={setInputFormat}
@@ -68,7 +59,7 @@ export default function App() {
 
           {step === 'convert' && (
             <motion.div key="convert" {...transitionProps} className="w-full">
-              <ConvertScreen
+              <ConversionProgress
                 file={file}
                 inputFormat={inputFormat}
                 outputFormat={outputFormat}
@@ -80,10 +71,7 @@ export default function App() {
 
           {step === 'result' && (
             <motion.div key="result" {...transitionProps} className="w-full">
-              <ResultScreen
-                convertedUrl={convertedUrl}
-                setStep={setStep}
-              />
+              <ResultDisplay convertedUrl={convertedUrl} setStep={setStep} />
             </motion.div>
           )}
         </AnimatePresence>
