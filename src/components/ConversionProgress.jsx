@@ -41,6 +41,12 @@ export default function ConversionProgress({
           file = await imageCompression(file, options);
           console.log(`Compressed file ${file.name} to ${(file.size / 1024 / 1024).toFixed(2)} MB`);
 
+          // Check file size after compression (limit to 5MB for Vercel serverless functions)
+          const maxSizeMB = 5;
+          if (file.size / 1024 / 1024 > maxSizeMB) {
+            throw new Error(`File ${file.name} is too large (${(file.size / 1024 / 1024).toFixed(2)} MB). Maximum allowed size is ${maxSizeMB} MB.`);
+          }
+
           // Convert file to base64
           const reader = new FileReader();
           const base64Promise = new Promise((resolve) => {
@@ -103,6 +109,8 @@ export default function ConversionProgress({
             errorMessage = 'Server error: Unable to process the image. Please check your connection and try again.';
           } else if (error.message.includes('Conversion failed')) {
             errorMessage = 'Conversion failed. The image might be corrupted or unsupported.';
+          } else if (error.message.includes('too large')) {
+            errorMessage = error.message; // Use the specific file size error message
           }
           convertedUrlsArray.push({ url: null, originalName: file.name, error: errorMessage });
         }
