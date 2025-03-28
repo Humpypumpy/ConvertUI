@@ -28,21 +28,21 @@ code {
 }
 
 .btn-primary {
-  @apply bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600;
+  @apply bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-all duration-300;
 }
 
 .btn-secondary {
-  @apply bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400;
+  @apply bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 transition-all duration-300;
 }
 
 .card {
-  @apply bg-white dark:bg-gray-800 p-6 rounded shadow;
+  @apply bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg;
 }
 
 .input-field {
-  @apply border border-gray-300 dark:border-gray-600 rounded px-4 py-2 w-full;
+  @apply border border-gray-300 dark:border-gray-600 rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300;
 }
 
 .select-field {
-  @apply border border-gray-300 dark:border-gray-600 rounded px-4 py-2;
+  @apply border border-gray-300 dark:border-gray-600 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300;
 }
