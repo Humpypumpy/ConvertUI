@@ -2,6 +2,8 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import Cropper from 'react-easy-crop';
 import { motion, AnimatePresence } from 'framer-motion';
+import ReactCompareImage from 'react-compare-image';
+import imageCompression from 'browser-image-compression';
 
 export default function FormatSelection({
   files,
@@ -12,10 +14,7 @@ export default function FormatSelection({
   setOutputFormat,
   setStep,
   quality,
-  setQuality,
-  width,
   setWidth,
-  height,
   setHeight,
   watermark,
   setWatermark,
@@ -26,13 +25,41 @@ export default function FormatSelection({
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [isCropping, setIsCropping] = useState(false);
   const [fileSize, setFileSize] = useState(null);
+  const [convertedFileSize, setConvertedFileSize] = useState(null);
+  const [convertedPreviewUrl, setConvertedPreviewUrl] = useState(null);
 
+  // Calculate original file size
   useEffect(() => {
     if (files[currentFileIndex]) {
-      const file = files[currentFileIndex].original;
+      const file = files[currentFileIndex].cropped || files[currentFileIndex].original;
       setFileSize((file.size / 1024 / 1024).toFixed(2)); // Size in MB
     }
   }, [files, currentFileIndex]);
+
+  // Simulate conversion to get the converted file size and preview
+  useEffect(() => {
+    if (files[currentFileIndex]) {
+      const file = files[currentFileIndex].cropped || files[currentFileIndex].original;
+      const simulateConversion = async () => {
+        try {
+          const options = {
+            maxSizeMB: 1,
+            maxWidthOrHeight: 1920,
+            useWebWorker: true,
+            initialQuality: quality,
+          };
+          const compressedFile = await imageCompression(file, options);
+          setConvertedFileSize((compressedFile.size / 1024 / 1024).toFixed(2)); // Size in MB
+          setConvertedPreviewUrl(URL.createObjectURL(compressedFile));
+        } catch (error) {
+          console.error('Error simulating conversion:', error);
+          setConvertedFileSize(null);
+          setConvertedPreviewUrl(null);
+        }
+      };
+      simulateConversion();
+    }
+  }, [files, currentFileIndex, quality]);
 
   const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
     setCroppedAreaPixels(croppedAreaPixels);
@@ -116,7 +143,7 @@ export default function FormatSelection({
           <ChevronRight size={20} />
         </button>
       </div>
-      {/* Image Preview and Cropping */}
+      {/* Image Comparison */}
       {files[currentFileIndex] && (
         <div className="card">
           <p className="text-lg font-semibold text-primary mb-2">
@@ -160,16 +187,34 @@ export default function FormatSelection({
                 </div>
               ) : (
                 <>
-                  <img
-                    src={files[currentFileIndex].cropped ? URL.createObjectURL(files[currentFileIndex].cropped) : files[currentFileIndex].previewUrl}
-                    alt="Preview"
-                    className="preview-image"
-                  />
-                  <p className="preview-label text-center">
-                    {inputFormat} • {fileSize} MB
-                  </p>
+                  <div className="relative w-full aspect-square rounded-xl overflow-hidden">
+                    <ReactCompareImage
+                      leftImage={files[currentFileIndex].previewUrl}
+                      rightImage={convertedPreviewUrl || files[currentFileIndex].previewUrl}
+                      sliderLineWidth={2}
+                      sliderLineColor="#FFFFFF"
+                      handle={
+                        <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-md">
+                          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10 0L8 2L12 2L10 0Z" fill="#FF2E63" />
+                            <path d="M10 20L12 18L8 18L10 20Z" fill="#3EC1D3" />
+                            <path d="M0 10L2 8L2 12L0 10Z" fill="#FF2E63" />
+                            <path d="M20 10L18 12L18 8L20 10Z" fill="#3EC1D3" />
+                          </svg>
+                        </div>
+                      }
+                    />
+                  </div>
+                  <div className="flex justify-between mt-2">
+                    <p className="preview-label">
+                      Original: {inputFormat} • {fileSize} MB
+                    </p>
+                    <p className="preview-label">
+                      Converted: {outputFormat} • {convertedFileSize ? `${convertedFileSize} MB` : 'Estimating...'}
+                    </p>
+                  </div>
                   <button
-                    className="mt-2 py-2 px-4 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-all duration-300 w-full"
+                    className="mt-4 py-2 px-4 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-all duration-300 w-full"
                     onClick={() => setIsCropping(true)}
                   >
                     Crop Image
@@ -286,24 +331,3 @@ export default function FormatSelection({
               />
             )}
             <select
-              value={watermark.position}
-              onChange={(e) => setWatermark({ ...watermark, position: e.target.value })}
-              className="select-field w-full"
-            >
-              <option value="top-left">Top Left</option>
-              <option value="top-right">Top Right</option>
-              <option value="bottom-left">Bottom Left</option>
-              <option value="bottom-right">Bottom Right</option>
-            </select>
-          </>
-        )}
-      </div>
-      <button
-        className="btn-convert w-full"
-        onClick={handleConvertClick}
-      >
-        Convert
-      </button>
-    </div>
-  );
-}
