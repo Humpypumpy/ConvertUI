@@ -12,6 +12,7 @@ export default function ConversionProgress({
   height,
   grayscale,
   rotation,
+  watermark,
 }) {
   const [progress, setProgress] = useState(0);
 
@@ -33,8 +34,8 @@ export default function ConversionProgress({
         try {
           // Pre-compress the image on the client side
           const options = {
-            maxSizeMB: 1, // Compress to a maximum of 1MB
-            maxWidthOrHeight: 1920, // Resize to a maximum dimension of 1920px
+            maxSizeMB: 1,
+            maxWidthOrHeight: 1920,
             useWebWorker: true,
           };
           file = await imageCompression(file, options);
@@ -48,6 +49,17 @@ export default function ConversionProgress({
           });
           const base64File = await base64Promise;
 
+          // Convert watermark image to base64 if present
+          let watermarkImageBase64 = null;
+          if (watermark.type === 'image' && watermark.image) {
+            const watermarkReader = new FileReader();
+            const watermarkPromise = new Promise((resolve) => {
+              watermarkReader.onload = () => resolve(watermarkReader.result.split(',')[1]);
+              watermarkReader.readAsDataURL(watermark.image);
+            });
+            watermarkImageBase64 = await watermarkPromise;
+          }
+
           // Send to API
           const response = await fetch('/api/convert', {
             method: 'POST',
@@ -60,6 +72,12 @@ export default function ConversionProgress({
               height,
               grayscale,
               rotation,
+              watermark: {
+                type: watermark.type,
+                text: watermark.text,
+                image: watermarkImageBase64,
+                position: watermark.position,
+              },
             }),
           });
 
@@ -80,7 +98,13 @@ export default function ConversionProgress({
           convertedUrlsArray.push({ url, originalName: file.name });
         } catch (error) {
           console.error(`ConversionProgress: Error converting file ${file.name}:`, error);
-          convertedUrlsArray.push({ url: null, originalName: file.name, error: error.message });
+          let errorMessage = 'Failed to convert the image. Please try again later.';
+          if (error.message.includes('Unexpected token')) {
+            errorMessage = 'Server error: Unable to process the image. Please check your connection and try again.';
+          } else if (error.message.includes('Conversion failed')) {
+            errorMessage = 'Conversion failed. The image might be corrupted or unsupported.';
+          }
+          convertedUrlsArray.push({ url: null, originalName: file.name, error: errorMessage });
         }
 
         // Update progress
@@ -96,7 +120,7 @@ export default function ConversionProgress({
     return () => {
       console.log("ConversionProgress: Cleaning up");
     };
-  }, [files, inputFormat, outputFormat, setConvertedUrls, setStep, quality, width, height, grayscale, rotation]);
+  }, [files, inputFormat, outputFormat, setConvertedUrls, setStep, quality, width, height, grayscale, rotation, watermark]);
 
   const handleCancel = () => {
     setStep('upload');
