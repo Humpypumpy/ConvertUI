@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import imageCompression from 'browser-image-compression';
 
 export default function ConversionProgress({
   files,
@@ -27,9 +28,18 @@ export default function ConversionProgress({
       const convertedUrlsArray = [];
 
       for (let i = 0; i < files.length; i++) {
-        const file = files[i].cropped || files[i].original;
+        let file = files[i].cropped || files[i].original;
 
         try {
+          // Pre-compress the image on the client side
+          const options = {
+            maxSizeMB: 1, // Compress to a maximum of 1MB
+            maxWidthOrHeight: 1920, // Resize to a maximum dimension of 1920px
+            useWebWorker: true,
+          };
+          file = await imageCompression(file, options);
+          console.log(`Compressed file ${file.name} to ${(file.size / 1024 / 1024).toFixed(2)} MB`);
+
           // Convert file to base64
           const reader = new FileReader();
           const base64Promise = new Promise((resolve) => {
