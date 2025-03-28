@@ -15,7 +15,7 @@ const transitionProps = {
   transition: { duration: 0.4, ease: 'easeInOut' },
 };
 
-const supportedFormats = ['JPG', 'PNG', 'HEIC', 'WEBP', 'GIF'];
+const supportedFormats = ['JPG', 'PNG', 'HEIC', 'WEBP', 'GIF', 'TIFF', 'AVIF'];
 
 export default function App() {
   const [step, setStep] = useState('upload');
