@@ -46,7 +46,3 @@ code {
 .select-field {
   @apply border border-gray-300 dark:border-gray-600 rounded px-4 py-2;
 }
-
-.checkbox {
-  @apply form-checkbox;
-}
