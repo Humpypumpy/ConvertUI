@@ -20,10 +20,10 @@ const supportedFormats = ['JPG', 'PNG', 'HEIC', 'WEBP', 'GIF', 'TIFF', 'AVIF'];
 export default function App() {
   const [step, setStep] = useState('upload');
   const [isDark, setIsDark] = useState(false);
-  const [files, setFiles] = useState([]);
+  const [files, setFiles] = useState([]); // Array of file objects
   const [inputFormat, setInputFormat] = useState('');
   const [outputFormat, setOutputFormat] = useState('PNG');
-  const [convertedUrls, setConvertedUrls] = useState([]);
+  const [convertedUrls, setConvertedUrls] = useState([]); // Array of converted URLs
   const [quality, setQuality] = useState(0.8);
   const [width, setWidth] = useState('');
   const [height, setHeight] = useState('');
@@ -32,7 +32,7 @@ export default function App() {
   const [watermark, setWatermark] = useState({ type: 'none', text: '', image: null, position: 'bottom-right' });
 
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', isDark);
+    document.body.classList.toggle('dark', isDark);
   }, [isDark]);
 
   const handleSetFiles = (fileList) => {
@@ -56,13 +56,11 @@ export default function App() {
     setStep(newStep);
   };
 
-  console.log("App: Current state - step:", step, "files:", files, "convertedUrls:", convertedUrls);
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 dark:from-gray-900 dark:via-gray-800 dark:to-black text-gray-900 dark:text-white px-4 py-8 flex flex-col items-center relative overflow-hidden">
-      <DarkModeToggle isDark={isDark} setIsDark={setIsDark} />
       <Header />
-      <div className="mt-12 w-full max-w-lg flex flex-col items-center">
+      <DarkModeToggle isDark={isDark} setIsDark={setIsDark} />
+      <div className="mt-12 w-full max-w-2xl flex flex-col items-center">
         <AnimatePresence mode="wait">
           {step === 'upload' && (
             <motion.div key="upload" {...transitionProps} className="w-full">
@@ -89,6 +87,8 @@ export default function App() {
                 setGrayscale={setGrayscale}
                 rotation={rotation}
                 setRotation={setRotation}
+                watermark={watermark}
+                setWatermark={setWatermark}
               />
             </motion.div>
           )}
