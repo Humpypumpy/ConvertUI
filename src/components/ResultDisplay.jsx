@@ -47,8 +47,8 @@ export default function ResultDisplay({ convertedUrls, outputFormat, setStep }) 
   };
 
   return (
-    <div className="w-full bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
-      <h2 className="text-xl font-semibold text-center text-indigo-800 dark:text-white mb-4">
+    <div className="card w-full">
+      <h2 className="text-2xl font-semibold text-center text-indigo-800 dark:text-white mb-4">
         Conversion Complete!
       </h2>
       <div className="space-y-4 mb-6">
@@ -78,7 +78,7 @@ export default function ResultDisplay({ convertedUrls, outputFormat, setStep }) 
                 </a>
               </>
             ) : (
-              <p className="text-red-500">Error: {item.error}</p>
+              <p className="text-red-500">{item.error}</p>
             )}
           </div>
         ))}
