@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Toaster } from 'react-hot-toast';
 
 import UploadSection from './components/UploadSection';
 import FormatSelection from './components/FormatSelection';
@@ -19,7 +20,7 @@ const supportedFormats = ['JPG', 'PNG', 'HEIC', 'WEBP', 'GIF', 'TIFF', 'AVIF'];
 
 export default function App() {
   const [step, setStep] = useState('upload');
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(true); // Force dark mode
   const [files, setFiles] = useState([]); // Array of file objects
   const [inputFormat, setInputFormat] = useState('');
   const [outputFormat, setOutputFormat] = useState('PNG');
@@ -27,8 +28,6 @@ export default function App() {
   const [quality, setQuality] = useState(0.8);
   const [width, setWidth] = useState('');
   const [height, setHeight] = useState('');
-  const [grayscale, setGrayscale] = useState(false);
-  const [rotation, setRotation] = useState(0);
   const [watermark, setWatermark] = useState({ type: 'none', text: '', image: null, position: 'bottom-right' });
 
   useEffect(() => {
@@ -57,10 +56,11 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-500 dark:from-gray-900 dark:to-gray-800 text-gray-900 dark:text-white px-4 py-8 flex flex-col items-center relative overflow-hidden">
+    <div className="min-h-screen bg-[#0D0D0D] text-white px-4 py-8 flex flex-col items-center relative overflow-hidden">
+      <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
       <Header />
       <DarkModeToggle isDark={isDark} setIsDark={setIsDark} />
-      <div className="mt-12 w-full max-w-2xl flex flex-col items-center">
+      <div className="mt-12 w-full max-w-md flex flex-col items-center">
         <AnimatePresence mode="wait">
           {step === 'upload' && (
             <motion.div key="upload" {...transitionProps} className="w-full">
@@ -83,10 +83,6 @@ export default function App() {
                 setWidth={setWidth}
                 height={height}
                 setHeight={setHeight}
-                grayscale={grayscale}
-                setGrayscale={setGrayscale}
-                rotation={rotation}
-                setRotation={setRotation}
                 watermark={watermark}
                 setWatermark={setWatermark}
               />
@@ -103,8 +99,6 @@ export default function App() {
                 quality={quality}
                 width={width}
                 height={height}
-                grayscale={grayscale}
-                rotation={rotation}
                 watermark={watermark}
               />
             </motion.div>
@@ -120,7 +114,7 @@ export default function App() {
           )}
         </AnimatePresence>
       </div>
-      <p className="mt-auto text-sm text-gray-300 dark:text-gray-400 pt-8 font-medium">
+      <p className="mt-auto text-sm text-gray-400 pt-8 font-medium">
         Built with ❤️ for Telegram Mini Apps
       </p>
     </div>
