@@ -1,52 +1,36 @@
-import React, { useRef } from 'react';
-import { Upload, Camera, Clock } from 'lucide-react';
+import React from 'react';
+import { Upload } from 'lucide-react';
 
-export default function UploadSection({ setStep, setFile, setInputFormat }) {
-  const fileInputRef = useRef(null);
-
-  const handleUploadClick = () => {
-    fileInputRef.current.click();
-  };
-
-  const handleFileChange = (event) => {
-    const selectedFile = event.target.files[0];
-    if (selectedFile) {
-      setFile(selectedFile);
-      // Detect file extension and set inputFormat
-      const extension = selectedFile.name.split('.').pop().toUpperCase();
-      if (['JPG', 'JPEG', 'PNG', 'HEIC', 'WEBP', 'GIF'].includes(extension)) {
-        setInputFormat(extension === 'JPEG' ? 'JPG' : extension);
-      } else {
-        setInputFormat('JPG'); // Fallback
-      }
+export default function UploadSection({ setStep, setFiles, setInputFormat }) {
+  const handleFileChange = (e) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      setFiles(files); // Pass the FileList to App.jsx
       setStep('select');
     }
   };
 
   return (
-    <>
-      <button
-        className="w-full py-5 px-8 bg-white dark:bg-gray-800 text-indigo-700 dark:text-teal-300 text-xl font-semibold rounded-xl shadow-xl flex items-center justify-center gap-3 hover:bg-indigo-100 dark:hover:bg-gray-700 hover:shadow-2xl transition-all duration-300 group"
-        onClick={handleUploadClick}
-      >
-        <Upload size={24} className="group-hover:-translate-y-1 transition-transform" />
-        Upload Image
-      </button>
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleFileChange}
-        accept="image/*"
-        className="hidden"
-      />
-      <div className="mt-6 flex gap-4">
-        <button className="flex items-center gap-2 bg-white dark:bg-gray-800 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md hover:scale-105 transition-all duration-200">
-          <Camera size={18} /> Camera
-        </button>
-        <button className="flex items-center gap-2 bg-white dark:bg-gray-800 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md hover:scale-105 transition-all duration-200">
-          <Clock size={18} /> Recent
-        </button>
-      </div>
-    </>
+    <div className="w-full bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+      <h2 className="text-xl font-semibold text-center text-indigo-800 dark:text-white mb-4">
+        Upload Your Images
+      </h2>
+      <p className="text-sm text-indigo-600 dark:text-teal-200 text-center mb-6">
+        Select one or more images to convert
+      </p>
+      <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-indigo-300 dark:border-teal-500 rounded-lg cursor-pointer hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-300">
+        <Upload size={32} className="text-indigo-500 dark:text-teal-400 mb-2" />
+        <span className="text-indigo-600 dark:text-teal-200 font-medium">
+          Click to upload images
+        </span>
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handleFileChange}
+          className="hidden"
+        />
+      </label>
+    </div>
   );
 }
