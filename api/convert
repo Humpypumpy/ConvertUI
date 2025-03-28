@@ -48,6 +48,12 @@ module.exports = async (req, res) => {
       case 'gif':
         outputBuffer = await sharpInstance.gif().toBuffer();
         break;
+      case 'tiff':
+        outputBuffer = await sharpInstance.tiff().toBuffer();
+        break;
+      case 'avif':
+        outputBuffer = await sharpInstance.avif({ quality: qualityValue }).toBuffer();
+        break;
       case 'heic':
         outputBuffer = await sharpInstance.heif({ quality: qualityValue }).toBuffer();
         break;
