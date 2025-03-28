@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import imageCompression from 'browser-image-compression';
+import toast from 'react-hot-toast';
 
 export default function ConversionProgress({
   files,
@@ -10,11 +11,10 @@ export default function ConversionProgress({
   quality,
   width,
   height,
-  grayscale,
-  rotation,
   watermark,
 }) {
   const [progress, setProgress] = useState(0);
+  const [compressing, setCompressing] = useState(false);
 
   useEffect(() => {
     if (!files || files.length === 0) {
@@ -33,12 +33,14 @@ export default function ConversionProgress({
 
         try {
           // Pre-compress the image on the client side
+          setCompressing(true);
           const options = {
             maxSizeMB: 1,
             maxWidthOrHeight: 1920,
             useWebWorker: true,
           };
           file = await imageCompression(file, options);
+          setCompressing(false);
           console.log(`Compressed file ${file.name} to ${(file.size / 1024 / 1024).toFixed(2)} MB`);
 
           // Check file size after compression (limit to 5MB for Vercel serverless functions)
@@ -76,8 +78,6 @@ export default function ConversionProgress({
               quality,
               width,
               height,
-              grayscale,
-              rotation,
               watermark: {
                 type: watermark.type,
                 text: watermark.text,
@@ -112,7 +112,8 @@ export default function ConversionProgress({
           } else if (error.message.includes('too large')) {
             errorMessage = error.message;
           }
-          convertedUrlsArray.push({ url: null, originalName: file.name, error: errorMessage });
+          toast.error(errorMessage);
+          convertedUrlsArray.push({ url: null, originalName: file.name, error: null });
         }
 
         // Update progress
@@ -128,36 +129,44 @@ export default function ConversionProgress({
     return () => {
       console.log("ConversionProgress: Cleaning up");
     };
-  }, [files, inputFormat, outputFormat, setConvertedUrls, setStep, quality, width, height, grayscale, rotation, watermark]);
+  }, [files, inputFormat, outputFormat, setConvertedUrls, setStep, quality, width, height, watermark]);
 
   const handleCancel = () => {
     setStep('upload');
   };
 
   return (
-    <div className="card w-full flex flex-col items-center">
-      <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-gray-100 mb-4">
-        Converting...
-      </h2>
-      <div className="w-24 h-24 border-8 border-t-teal-500 rounded-full animate-spin" />
-      <p className="mt-6 text-lg font-medium text-gray-800 dark:text-gray-100">
-        Converting {files.length} image(s) from {inputFormat} to {outputFormat || 'Unknown'}...
-      </p>
-      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mt-4">
-        <div
-          className="bg-teal-500 h-2.5 rounded-full transition-all duration-300"
-          style={{ width: `${progress}%` }}
-        ></div>
+    <div className="w-full max-w-md flex flex-col items-center gap-6">
+      <div className="card w-full flex flex-col items-center">
+        <h2 className="text-2xl font-bold text-center text-primary mb-4">
+          {compressing ? 'Compressing...' : 'Converting...'}
+        </h2>
+        <div className="w-24 h-24 border-8 border-t-teal-500 rounded-full animate-spin" />
+        <p className="mt-6 text-lg font-medium text-primary">
+          {compressing
+            ? 'Compressing images before conversion...'
+            : `Converting ${files.length} image(s) from ${inputFormat} to ${outputFormat || 'Unknown'}...`}
+        </p>
+        {!compressing && (
+          <>
+            <div className="w-full bg-gray-600 rounded-full h-2.5 mt-4">
+              <div
+                className="bg-teal-500 h-2.5 rounded-full transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              ></div>
+            </div>
+            <p className="mt-2 text-sm text-secondary">
+              {Math.round(progress)}% Complete
+            </p>
+          </>
+        )}
+        <button
+          className="mt-4 text-red-500 font-medium hover:underline"
+          onClick={handleCancel}
+        >
+          Cancel
+        </button>
       </div>
-      <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-        {Math.round(progress)}% Complete
-      </p>
-      <button
-        className="mt-4 text-red-500 font-medium hover:underline"
-        onClick={handleCancel}
-      >
-        Cancel
-      </button>
     </div>
   );
 }
