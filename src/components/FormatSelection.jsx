@@ -26,6 +26,10 @@ export default function FormatSelection({
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [isCropping, setIsCropping] = useState(false);
+  const [watermarkType, setWatermarkType] = useState('none'); // 'none', 'text', or 'image'
+  const [watermarkText, setWatermarkText] = useState('');
+  const [watermarkImage, setWatermarkImage] = useState(null);
+  const [watermarkPosition, setWatermarkPosition] = useState('bottom-right'); // 'top-left', 'top-right', 'bottom-left', 'bottom-right'
 
   const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
     setCroppedAreaPixels(croppedAreaPixels);
@@ -65,7 +69,6 @@ export default function FormatSelection({
         }, files[currentFileIndex].original.type);
       });
 
-      // Update the file with the cropped version
       const updatedFiles = [...files];
       updatedFiles[currentFileIndex].cropped = croppedImage;
       setFiles(updatedFiles);
@@ -75,8 +78,23 @@ export default function FormatSelection({
     }
   };
 
+  const handleWatermarkImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setWatermarkImage(file);
+    }
+  };
+
   const handleConvertClick = () => {
-    setStep('convert');
+    // Pass watermark settings to the next step
+    setStep('convert', {
+      watermark: {
+        type: watermarkType,
+        text: watermarkText,
+        image: watermarkImage,
+        position: watermarkPosition,
+      },
+    });
   };
 
   const availableFormats = formats.filter((format) => format !== inputFormat);
@@ -243,6 +261,69 @@ export default function FormatSelection({
             <option value={180}>180°</option>
             <option value={270}>270°</option>
           </select>
+        </div>
+        {/* Watermark Section */}
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium text-indigo-600 dark:text-teal-200">
+            Watermark:
+          </label>
+          <select
+            value={watermarkType}
+            onChange={(e) => setWatermarkType(e.target.value)}
+            className="bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+          >
+            <option value="none">None</option>
+            <option value="text">Text Watermark</option>
+            <option value="image">Image Watermark</option>
+          </select>
+          {watermarkType === 'text' && (
+            <>
+              <input
+                type="text"
+                value={watermarkText}
+                onChange={(e) => setWatermarkText(e.target.value)}
+                placeholder="Enter watermark text"
+                className="w-full mt-1 bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+              />
+              <select
+                value={watermarkPosition}
+                onChange={(e) => setWatermarkPosition(e.target.value)}
+                className="bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+              >
+                <option value="top-left">Top Left</option>
+                <option value="top-right">Top Right</option>
+                <option value="bottom-left">Bottom Left</option>
+                <option value="bottom-right">Bottom Right</option>
+              </select>
+            </>
+          )}
+          {watermarkType === 'image' && (
+            <>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleWatermarkImageChange}
+                className="w-full mt-1"
+              />
+              {watermarkImage && (
+                <img
+                  src={URL.createObjectURL(watermarkImage)}
+                  alt="Watermark Preview"
+                  className="w-24 h-24 object-contain mt-2"
+                />
+              )}
+              <select
+                value={watermarkPosition}
+                onChange={(e) => setWatermarkPosition(e.target.value)}
+                className="bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+              >
+                <option value="top-left">Top Left</option>
+                <option value="top-right">Top Right</option>
+                <option value="bottom-left">Bottom Left</option>
+                <option value="bottom-right">Bottom Right</option>
+              </select>
+            </>
+          )}
         </div>
       </div>
       <button
