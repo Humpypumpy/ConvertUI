@@ -19,6 +19,13 @@ module.exports = async (req, res) => {
     // Process the image with sharp
     let sharpInstance = sharp(buffer);
 
+    if (grayscale) {
+    sharpInstance = sharpInstance.grayscale();
+    }
+    if (rotation) {
+    sharpInstance = sharpInstance.rotate(parseInt(rotation));
+    }
+
     // Resize if width or height is provided
     if (width || height) {
       sharpInstance = sharpInstance.resize({
