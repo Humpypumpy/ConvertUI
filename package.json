@@ -1,6 +1,7 @@
 {
   "name": "telegram-image-converter-ui",
   "version": "1.0.0",
+  "type": "module", // Add this line
   "private": true,
   "scripts": {
     "dev": "vite",
