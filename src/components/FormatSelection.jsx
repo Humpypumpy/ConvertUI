@@ -331,3 +331,24 @@ export default function FormatSelection({
               />
             )}
             <select
+              value={watermark.position}
+              onChange={(e) => setWatermark({ ...watermark, position: e.target.value })}
+              className="select-field w-full"
+            >
+              <option value="top-left">Top Left</option>
+              <option value="top-right">Top Right</option>
+              <option value="bottom-left">Bottom Left</option>
+              <option value="bottom-right">Bottom Right</option>
+            </select>
+          </>
+        )}
+      </div>
+      <button
+        className="btn-convert w-full"
+        onClick={handleConvertClick}
+      >
+        Convert
+      </button>
+    </div>
+  );
+}
