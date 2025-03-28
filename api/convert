@@ -1,0 +1,65 @@
+// api/convert.js
+const sharp = require('sharp');
+
+module.exports = async (req, res) => {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  try {
+    const { file, outputFormat, quality, width, height } = req.body;
+
+    if (!file || !outputFormat) {
+      return res.status(400).json({ error: 'Missing file or output format' });
+    }
+
+    // Convert base64 file to buffer
+    const buffer = Buffer.from(file, 'base64');
+
+    // Process the image with sharp
+    let sharpInstance = sharp(buffer);
+
+    // Resize if width or height is provided
+    if (width || height) {
+      sharpInstance = sharpInstance.resize({
+        width: width ? parseInt(width) : undefined,
+        height: height ? parseInt(height) : undefined,
+        fit: 'inside', // Maintain aspect ratio
+        withoutEnlargement: true, // Prevent upscaling
+      });
+    }
+
+    // Set quality (for formats that support it)
+    const qualityValue = quality ? Math.round(quality * 100) : 80; // Default to 80%
+
+    // Convert to the desired format
+    let outputBuffer;
+    switch (outputFormat.toLowerCase()) {
+      case 'jpg':
+      case 'jpeg':
+        outputBuffer = await sharpInstance.jpeg({ quality: qualityValue }).toBuffer();
+        break;
+      case 'png':
+        outputBuffer = await sharpInstance.png({ quality: qualityValue }).toBuffer();
+        break;
+      case 'webp':
+        outputBuffer = await sharpInstance.webp({ quality: qualityValue }).toBuffer();
+        break;
+      case 'gif':
+        outputBuffer = await sharpInstance.gif().toBuffer();
+        break;
+      case 'heic':
+        outputBuffer = await sharpInstance.heif({ quality: qualityValue }).toBuffer();
+        break;
+      default:
+        return res.status(400).json({ error: 'Unsupported output format' });
+    }
+
+    // Send the converted image as a base64 string
+    const base64Output = outputBuffer.toString('base64');
+    res.status(200).json({ convertedImage: base64Output, format: outputFormat.toLowerCase() });
+  } catch (error) {
+    console.error('Conversion error:', error);
+    res.status(500).json({ error: 'Image conversion failed' });
+  }
+};
