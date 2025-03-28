@@ -139,17 +139,19 @@ export default function FormatSelection({
               transition={{ duration: 0.3 }}
             >
               {isCropping ? (
-                <div className="relative w-full h-64">
-                  <Cropper
-                    image={files[currentFileIndex].previewUrl}
-                    crop={crop}
-                    zoom={zoom}
-                    aspect={4 / 3}
-                    onCropChange={setCrop}
-                    onZoomChange={setZoom}
-                    onCropComplete={onCropComplete}
-                  />
-                  <div className="mt-4 flex gap-4">
+                <div className="relative w-full">
+                  <div className="h-64">
+                    <Cropper
+                      image={files[currentFileIndex].previewUrl}
+                      crop={crop}
+                      zoom={zoom}
+                      aspect={4 / 3}
+                      onCropChange={setCrop}
+                      onZoomChange={setZoom}
+                      onCropComplete={onCropComplete}
+                    />
+                  </div>
+                  <div className="mt-4 flex gap-4 z-10 relative">
                     <button
                       className="py-2 px-4 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-all duration-300"
                       onClick={handleCrop}
