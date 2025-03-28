@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import imageCompression from 'browser-image-compression';
 
 export default function ConversionProgress({
   file,
@@ -18,40 +17,59 @@ export default function ConversionProgress({
       return;
     }
 
-    console.log("ConversionProgress: Starting simulation with file:", file);
+    console.log("ConversionProgress: Starting conversion with file:", file);
 
-    const processImage = async () => {
+    const convertImage = async () => {
       try {
-        const options = {
-          maxSizeMB: 1, // Target max size
-          maxWidthOrHeight: Math.max(parseInt(width) || 1920, parseInt(height) || 1920), // Use width/height if provided
-          useWebWorker: true,
-          initialQuality: quality, // Use quality setting
-        };
+        // Convert file to base64
+        const reader = new FileReader();
+        const base64Promise = new Promise((resolve) => {
+          reader.onload = () => resolve(reader.result.split(',')[1]); // Remove "data:image/..." prefix
+          reader.readAsDataURL(file);
+        });
+        const base64File = await base64Promise;
 
-        // Compress and resize the image
-        const compressedFile = await imageCompression(file, options);
-        console.log("ConversionProgress: Compressed file:", compressedFile);
-
-        // Create a new File object with the correct extension
-        const newFileName = `converted-image.${outputFormat.toLowerCase()}`;
-        const convertedFile = new File([compressedFile], newFileName, {
-          type: `image/${outputFormat.toLowerCase()}`,
+        // Send to API
+        const response = await fetch('/api/convert', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            file: base64File,
+            outputFormat,
+            quality,
+            width,
+            height,
+          }),
         });
 
-        const url = URL.createObjectURL(convertedFile);
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || 'Conversion failed');
+        }
+
+        // Convert base64 response back to a blob
+        const byteCharacters = atob(data.convertedImage);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: `image/${data.format}` });
+
+        // Create URL for the blob
+        const url = URL.createObjectURL(blob);
         console.log("ConversionProgress: URL created:", url);
         setConvertedUrl(url);
         console.log("ConversionProgress: Set convertedUrl");
         setStep('result');
         console.log("ConversionProgress: Moved to result step");
       } catch (error) {
-        console.error("ConversionProgress: Error processing image:", error);
+        console.error("ConversionProgress: Error converting image:", error);
         setStep('upload');
       }
     };
 
-    processImage();
+    convertImage();
 
     return () => {
       console.log("ConversionProgress: Cleaning up");
