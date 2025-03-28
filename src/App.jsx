@@ -15,24 +15,40 @@ const transitionProps = {
   transition: { duration: 0.4, ease: 'easeInOut' },
 };
 
-const supportedFormats = ['JPG', 'PNG', 'HEIC', 'WEBP', 'GIF'];
+const supportedFormats = ['JPG', 'PNG', 'HEIC', 'WEBP', 'GIF', 'TIFF', 'AVIF'];
 
 export default function App() {
   const [step, setStep] = useState('upload');
   const [isDark, setIsDark] = useState(false);
-  const [file, setFile] = useState(null);
-  const [inputFormat, setInputFormat] = useState(''); // Will auto-detect
+  const [files, setFiles] = useState([]); // Now an array of file objects
+  const [inputFormat, setInputFormat] = useState('');
   const [outputFormat, setOutputFormat] = useState('PNG');
-  const [convertedUrl, setConvertedUrl] = useState(null);
-  const [quality, setQuality] = useState(0.8); // Default quality (0 to 1)
-  const [width, setWidth] = useState(''); // Empty means no resize
-  const [height, setHeight] = useState(''); // Empty means no resize
+  const [convertedUrls, setConvertedUrls] = useState([]);
+  const [quality, setQuality] = useState(0.8);
+  const [width, setWidth] = useState('');
+  const [height, setHeight] = useState('');
+  const [grayscale, setGrayscale] = useState(false);
+  const [rotation, setRotation] = useState(0);
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', isDark);
   }, [isDark]);
 
-  console.log("App: Current state - step:", step, "file:", file, "convertedUrl:", convertedUrl);
+  const handleSetFiles = (fileList) => {
+    const fileArray = Array.from(fileList).map((file) => ({
+      original: file,
+      cropped: null,
+      previewUrl: URL.createObjectURL(file),
+    }));
+    setFiles(fileArray);
+    if (fileArray.length > 0) {
+      const inputFormat = fileArray[0].original.name.split('.').pop().toUpperCase();
+      setInputFormat(inputFormat);
+      setStep('select');
+    }
+  };
+
+  console.log("App: Current state - step:", step, "files:", files, "convertedUrls:", convertedUrls);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-white dark:from-gray-900 dark:to-black text-gray-900 dark:text-white px-6 py-8 flex flex-col items-center relative overflow-hidden">
@@ -42,12 +58,14 @@ export default function App() {
         <AnimatePresence mode="wait">
           {step === 'upload' && (
             <motion.div key="upload" {...transitionProps} className="w-full">
-              <UploadSection setStep={setStep} setFile={setFile} setInputFormat={setInputFormat} />
+              <UploadSection setStep={setStep} setFiles={handleSetFiles} setInputFormat={setInputFormat} />
             </motion.div>
           )}
           {step === 'select' && (
             <motion.div key="select" {...transitionProps} className="w-full">
               <FormatSelection
+                files={files}
+                setFiles={setFiles}
                 formats={supportedFormats}
                 inputFormat={inputFormat}
                 outputFormat={outputFormat}
@@ -59,27 +77,33 @@ export default function App() {
                 setWidth={setWidth}
                 height={height}
                 setHeight={setHeight}
+                grayscale={grayscale}
+                setGrayscale={setGrayscale}
+                rotation={rotation}
+                setRotation={setRotation}
               />
             </motion.div>
           )}
           {step === 'convert' && (
             <motion.div key="convert" {...transitionProps} className="w-full">
               <ConversionProgress
-                file={file}
+                files={files}
                 inputFormat={inputFormat}
                 outputFormat={outputFormat}
-                setConvertedUrl={setConvertedUrl}
+                setConvertedUrls={setConvertedUrls}
                 setStep={setStep}
                 quality={quality}
                 width={width}
                 height={height}
+                grayscale={grayscale}
+                rotation={rotation}
               />
             </motion.div>
           )}
           {step === 'result' && (
             <motion.div key="result" {...transitionProps} className="w-full">
               <ResultDisplay
-                convertedUrl={convertedUrl}
+                convertedUrls={convertedUrls}
                 outputFormat={outputFormat}
                 setStep={setStep}
               />
