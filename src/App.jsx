@@ -20,7 +20,7 @@ const supportedFormats = ['JPG', 'PNG', 'HEIC', 'WEBP', 'GIF', 'TIFF', 'AVIF'];
 export default function App() {
   const [step, setStep] = useState('upload');
   const [isDark, setIsDark] = useState(false);
-  const [files, setFiles] = useState([]); // Now an array of file objects
+  const [files, setFiles] = useState([]);
   const [inputFormat, setInputFormat] = useState('');
   const [outputFormat, setOutputFormat] = useState('PNG');
   const [convertedUrls, setConvertedUrls] = useState([]);
@@ -29,6 +29,7 @@ export default function App() {
   const [height, setHeight] = useState('');
   const [grayscale, setGrayscale] = useState(false);
   const [rotation, setRotation] = useState(0);
+  const [watermark, setWatermark] = useState({ type: 'none', text: '', image: null, position: 'bottom-right' });
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', isDark);
@@ -48,13 +49,20 @@ export default function App() {
     }
   };
 
+  const handleSetStep = (newStep, additionalData = {}) => {
+    if (newStep === 'convert') {
+      setWatermark(additionalData.watermark || { type: 'none', text: '', image: null, position: 'bottom-right' });
+    }
+    setStep(newStep);
+  };
+
   console.log("App: Current state - step:", step, "files:", files, "convertedUrls:", convertedUrls);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-white dark:from-gray-900 dark:to-black text-gray-900 dark:text-white px-6 py-8 flex flex-col items-center relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 dark:from-gray-900 dark:via-gray-800 dark:to-black text-gray-900 dark:text-white px-4 py-8 flex flex-col items-center relative overflow-hidden">
       <DarkModeToggle isDark={isDark} setIsDark={setIsDark} />
       <Header />
-      <div className="mt-10 w-full max-w-md flex flex-col items-center">
+      <div className="mt-12 w-full max-w-lg flex flex-col items-center">
         <AnimatePresence mode="wait">
           {step === 'upload' && (
             <motion.div key="upload" {...transitionProps} className="w-full">
@@ -70,7 +78,7 @@ export default function App() {
                 inputFormat={inputFormat}
                 outputFormat={outputFormat}
                 setOutputFormat={setOutputFormat}
-                setStep={setStep}
+                setStep={handleSetStep}
                 quality={quality}
                 setQuality={setQuality}
                 width={width}
@@ -97,6 +105,7 @@ export default function App() {
                 height={height}
                 grayscale={grayscale}
                 rotation={rotation}
+                watermark={watermark}
               />
             </motion.div>
           )}

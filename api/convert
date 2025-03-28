@@ -1,78 +1,125 @@
-// api/convert.js
-const sharp = require('sharp');
+import sharp from 'sharp';
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    const { file, outputFormat, quality, width, height } = req.body;
+    const { file, outputFormat, quality, width, height, grayscale, rotation, watermark } = req.body;
 
     if (!file || !outputFormat) {
-      return res.status(400).json({ error: 'Missing file or output format' });
+      return res.status(400).json({ error: 'Missing required fields' });
     }
 
     // Convert base64 file to buffer
-    const buffer = Buffer.from(file, 'base64');
+    const imageBuffer = Buffer.from(file, 'base64');
 
-    // Process the image with sharp
-    let sharpInstance = sharp(buffer);
+    // Start processing with sharp
+    let image = sharp(imageBuffer);
 
-    if (grayscale) {
-    sharpInstance = sharpInstance.grayscale();
-    }
+    // Apply rotation
     if (rotation) {
-    sharpInstance = sharpInstance.rotate(parseInt(rotation));
+      image = image.rotate(rotation);
     }
 
-    // Resize if width or height is provided
+    // Apply resizing
     if (width || height) {
-      sharpInstance = sharpInstance.resize({
-        width: width ? parseInt(width) : undefined,
-        height: height ? parseInt(height) : undefined,
-        fit: 'inside', // Maintain aspect ratio
-        withoutEnlargement: true, // Prevent upscaling
+      image = image.resize({
+        width: width ? parseInt(width) : null,
+        height: height ? parseInt(height) : null,
+        fit: 'contain',
       });
     }
 
-    // Set quality (for formats that support it)
-    const qualityValue = quality ? Math.round(quality * 100) : 80; // Default to 80%
-
-    // Convert to the desired format
-    let outputBuffer;
-    switch (outputFormat.toLowerCase()) {
-      case 'jpg':
-      case 'jpeg':
-        outputBuffer = await sharpInstance.jpeg({ quality: qualityValue }).toBuffer();
-        break;
-      case 'png':
-        outputBuffer = await sharpInstance.png({ quality: qualityValue }).toBuffer();
-        break;
-      case 'webp':
-        outputBuffer = await sharpInstance.webp({ quality: qualityValue }).toBuffer();
-        break;
-      case 'gif':
-        outputBuffer = await sharpInstance.gif().toBuffer();
-        break;
-      case 'tiff':
-        outputBuffer = await sharpInstance.tiff().toBuffer();
-        break;
-      case 'avif':
-        outputBuffer = await sharpInstance.avif({ quality: qualityValue }).toBuffer();
-        break;
-      case 'heic':
-        outputBuffer = await sharpInstance.heif({ quality: qualityValue }).toBuffer();
-        break;
-      default:
-        return res.status(400).json({ error: 'Unsupported output format' });
+    // Apply grayscale
+    if (grayscale) {
+      image = image.grayscale();
     }
 
-    // Send the converted image as a base64 string
-    const base64Output = outputBuffer.toString('base64');
-    res.status(200).json({ convertedImage: base64Output, format: outputFormat.toLowerCase() });
+    // Apply watermark
+    if (watermark && watermark.type !== 'none') {
+      const metadata = await image.metadata();
+      const imageWidth = metadata.width;
+      const imageHeight = metadata.height;
+
+      let watermarkBuffer;
+      if (watermark.type === 'text') {
+        // Create an SVG for the text watermark
+        const textSvg = `
+          <svg width="${imageWidth}" height="${imageHeight}">
+            <text x="0" y="0" font-family="Arial" font-size="40" fill="rgba(255,255,255,0.5)">
+              ${watermark.text}
+            </text>
+          </svg>
+        `;
+        watermarkBuffer = Buffer.from(textSvg);
+      } else if (watermark.type === 'image' && watermark.image) {
+        // Use the uploaded watermark image
+        watermarkBuffer = Buffer.from(watermark.image, 'base64');
+        // Resize the watermark to 20% of the image width
+        const watermarkImage = sharp(watermarkBuffer);
+        const watermarkMetadata = await watermarkImage.metadata();
+        const watermarkWidth = Math.round(imageWidth * 0.2);
+        const watermarkHeight = Math.round((watermarkWidth / watermarkMetadata.width) * watermarkMetadata.height);
+        watermarkBuffer = await watermarkImage
+          .resize(watermarkWidth, watermarkHeight)
+          .toBuffer();
+      }
+
+      // Determine watermark position
+      let top, left;
+      const margin = 20; // Margin from the edges
+      const watermarkMetadata = await sharp(watermarkBuffer).metadata();
+      const watermarkWidth = watermarkMetadata.width;
+      const watermarkHeight = watermarkMetadata.height;
+
+      switch (watermark.position) {
+        case 'top-left':
+          top = margin;
+          left = margin;
+          break;
+        case 'top-right':
+          top = margin;
+          left = imageWidth - watermarkWidth - margin;
+          break;
+        case 'bottom-left':
+          top = imageHeight - watermarkHeight - margin;
+          left = margin;
+          break;
+        case 'bottom-right':
+        default:
+          top = imageHeight - watermarkHeight - margin;
+          left = imageWidth - watermarkWidth - margin;
+          break;
+      }
+
+      // Composite the watermark onto the image
+      image = image.composite([
+        {
+          input: watermarkBuffer,
+          top,
+          left,
+          blend: 'over',
+        },
+      ]);
+    }
+
+    // Convert to the desired format and apply quality
+    const outputFormatLower = outputFormat.toLowerCase();
+    const convertedImage = await image
+      .toFormat(outputFormatLower, { quality: Math.round(quality * 100) })
+      .toBuffer();
+
+    // Convert the result to base64
+    const convertedImageBase64 = convertedImage.toString('base64');
+
+    res.status(200).json({
+      convertedImage: convertedImageBase64,
+      format: outputFormatLower,
+    });
   } catch (error) {
     console.error('Conversion error:', error);
-    res.status(500).json({ error: 'Image conversion failed' });
+    res.status(500).json({ error: 'Internal server error' });
   }
-};
+}
