@@ -4,45 +4,82 @@
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  background-color: #0D0D0D; /* Pure black background */
+  color: #FFFFFF; /* White primary text */
 }
 
 /* Custom styles */
-.bg-gradient {
-  background: linear-gradient(to bottom right, #3b82f6, #a855f7);
+.bg-container {
+  background-color: #1A1A1A; /* Container box background */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow */
 }
 
-.text-gradient {
-  background: -webkit-linear-gradient(#3b82f6, #a855f7);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.text-primary {
+  color: #FFFFFF; /* White primary text */
 }
 
-.btn-primary {
-  @apply bg-teal-500 text-white px-6 py-3 rounded-xl font-semibold shadow-md hover:bg-teal-600 hover:scale-105 transition-all duration-300;
+.text-secondary {
+  color: #A0A0A0; /* Soft gray secondary text */
 }
 
-.btn-secondary {
-  @apply bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-xl font-semibold shadow-md hover:bg-gray-300 dark:hover:bg-gray-600 hover:scale-105 transition-all duration-300;
+.text-highlight {
+  color: #AAAAAA; /* Highlight for timestamps */
+}
+
+.btn-convert {
+  background: linear-gradient(to right, #5F7BFF, #FF5B9B); /* Gradient button */
+  @apply text-white uppercase font-semibold px-6 py-3 rounded-full shadow-md hover:brightness-110 transition-all duration-300;
 }
 
 .card {
-  @apply bg-white dark:bg-gray-900 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700;
+  @apply bg-container p-6 rounded-lg shadow-md;
 }
 
 .input-field {
-  @apply border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100;
+  @apply bg-container text-primary border border-gray-600 rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300;
 }
 
 .select-field {
-  @apply border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100;
+  @apply bg-container text-primary border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300 appearance-none;
+}
+
+.slider-track {
+  @apply w-full h-2 bg-gray-600 rounded-full;
+}
+
+.slider-thumb {
+  @apply w-6 h-6 bg-white rounded-full shadow-md;
+}
+
+.preview-image {
+  @apply w-full h-auto aspect-square rounded-xl border border-gray-600;
+}
+
+.preview-label {
+  @apply text-sm text-secondary mt-2;
+}
+
+.recent-item {
+  @apply flex items-center gap-4 py-3 border-b border-gray-700;
+}
+
+.recent-thumbnail {
+  @apply w-12 h-12 rounded-lg border border-gray-600 object-cover;
+}
+
+.recent-file-name {
+  @apply text-sm font-semibold text-primary;
+}
+
+.recent-format-info {
+  @apply text-xs text-secondary;
+}
+
+.recent-timestamp {
+  @apply text-xs text-highlight ml-auto;
 }
