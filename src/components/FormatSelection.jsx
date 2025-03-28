@@ -81,6 +81,34 @@ export default function FormatSelection({
               className="w-full mt-1 bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500"
             />
           </div>
+
+          <div className="flex flex-col gap-2">
+  <label className="text-sm font-medium text-indigo-600 dark:text-teal-200">
+    Grayscale:
+  </label>
+  <input
+    type="checkbox"
+    checked={grayscale}
+    onChange={(e) => setGrayscale(e.target.checked)}
+    className="mt-1"
+  />
+</div>
+<div className="flex flex-col gap-2">
+  <label className="text-sm font-medium text-indigo-600 dark:text-teal-200">
+    Rotation:
+  </label>
+  <select
+    value={rotation}
+    onChange={(e) => setRotation(parseInt(e.target.value))}
+    className="bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+  >
+    <option value={0}>0°</option>
+    <option value={90}>90°</option>
+    <option value={180}>180°</option>
+    <option value={270}>270°</option>
+  </select>
+</div>
+          
           <div className="flex-1">
             <label className="text-sm font-medium text-indigo-600 dark:text-teal-200">
               Height (px):
