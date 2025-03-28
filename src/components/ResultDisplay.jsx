@@ -48,13 +48,13 @@ export default function ResultDisplay({ convertedUrls, outputFormat, setStep }) 
 
   return (
     <div className="card w-full">
-      <h2 className="text-2xl font-semibold text-center text-indigo-800 dark:text-white mb-4">
+      <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-gray-100 mb-4">
         Conversion Complete!
       </h2>
       <div className="space-y-4 mb-6">
         {convertedUrls.map((item, index) => (
-          <div key={index} className="border-b border-indigo-200 dark:border-gray-700 pb-4">
-            <p className="text-sm font-medium text-indigo-600 dark:text-teal-200 mb-2">
+          <div key={index} className="border-b border-gray-200 dark:border-gray-700 pb-4">
+            <p className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
               {item.originalName}
             </p>
             {item.url ? (
@@ -62,17 +62,17 @@ export default function ResultDisplay({ convertedUrls, outputFormat, setStep }) 
                 <img
                   src={item.url}
                   alt={`Converted ${item.originalName}`}
-                  className="w-full h-48 object-contain rounded-lg mb-2"
+                  className="w-full h-48 object-contain rounded-lg border border-gray-200 dark:border-gray-700 mb-2"
                 />
                 {fileSizes[index] && (
-                  <p className="text-sm text-indigo-600 dark:text-teal-200 mb-2">
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
                     File Size: {fileSizes[index]} MB
                   </p>
                 )}
                 <a
                   href={item.url}
                   download={`${item.originalName.split('.')[0]}.${outputFormat.toLowerCase()}`}
-                  className="inline-flex items-center py-2 px-4 bg-teal-500 text-white font-semibold rounded-lg shadow-lg hover:bg-teal-600 transition-all duration-300"
+                  className="inline-flex items-center py-2 px-4 bg-teal-500 text-white font-semibold rounded-lg shadow-md hover:bg-teal-600 transition-all duration-300"
                 >
                   <Download size={20} className="mr-2" /> Download
                 </a>
@@ -85,14 +85,14 @@ export default function ResultDisplay({ convertedUrls, outputFormat, setStep }) 
       </div>
       {convertedUrls.length > 1 && (
         <button
-          className="w-full py-3 mb-4 bg-indigo-500 text-white font-semibold rounded-lg shadow-lg hover:bg-indigo-600 transition-all duration-300"
+          className="btn-primary w-full mb-4"
           onClick={handleDownloadAll}
         >
           Download All as ZIP
         </button>
       )}
       <button
-        className="w-full py-3 bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-teal-300 rounded-lg shadow-md hover:bg-indigo-200 dark:hover:bg-gray-600 transition-all duration-300"
+        className="btn-secondary w-full"
         onClick={handleConvertAnother}
       >
         Convert Another
