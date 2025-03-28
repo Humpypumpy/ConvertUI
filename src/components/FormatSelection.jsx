@@ -92,7 +92,7 @@ export default function FormatSelection({
 
   return (
     <div className="card w-full">
-      <h2 className="text-2xl font-semibold text-center text-indigo-800 dark:text-white mb-4">
+      <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-gray-100 mb-4">
         Edit Your Images
       </h2>
       {/* File Navigation */}
@@ -100,17 +100,17 @@ export default function FormatSelection({
         <button
           onClick={() => setCurrentFileIndex((prev) => Math.max(prev - 1, 0))}
           disabled={currentFileIndex === 0}
-          className="p-2 bg-indigo-500 text-white rounded-full disabled:bg-gray-400 hover:bg-indigo-600 transition-all duration-300"
+          className="p-2 bg-teal-500 text-white rounded-full disabled:bg-gray-400 hover:bg-teal-600 transition-all duration-300"
         >
           <ChevronLeft size={20} />
         </button>
-        <span className="text-indigo-600 dark:text-teal-200 font-medium">
+        <span className="text-gray-600 dark:text-gray-300 font-medium">
           Image {currentFileIndex + 1} of {files.length}
         </span>
         <button
           onClick={() => setCurrentFileIndex((prev) => Math.min(prev + 1, files.length - 1))}
           disabled={currentFileIndex === files.length - 1}
-          className="p-2 bg-indigo-500 text-white rounded-full disabled:bg-gray-400 hover:bg-indigo-600 transition-all duration-300"
+          className="p-2 bg-teal-500 text-white rounded-full disabled:bg-gray-400 hover:bg-teal-600 transition-all duration-300"
         >
           <ChevronRight size={20} />
         </button>
@@ -118,7 +118,7 @@ export default function FormatSelection({
       {/* Image Preview and Cropping */}
       {files[currentFileIndex] && (
         <div className="mb-6">
-          <p className="text-sm font-medium text-indigo-600 dark:text-teal-200 mb-2">
+          <p className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
             {files[currentFileIndex].original.name}
           </p>
           <AnimatePresence mode="wait">
@@ -162,10 +162,10 @@ export default function FormatSelection({
                   <img
                     src={files[currentFileIndex].cropped ? URL.createObjectURL(files[currentFileIndex].cropped) : files[currentFileIndex].previewUrl}
                     alt="Preview"
-                    className="w-full h-48 object-contain rounded-lg border border-indigo-200 dark:border-gray-700"
+                    className="w-full h-48 object-contain rounded-lg border border-gray-200 dark:border-gray-700"
                   />
                   <button
-                    className="mt-2 py-2 px-4 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-all duration-300"
+                    className="mt-2 py-2 px-4 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-all duration-300"
                     onClick={() => setIsCropping(true)}
                   >
                     Crop Image
@@ -179,14 +179,14 @@ export default function FormatSelection({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-center gap-2">
-            <span className="text-lg font-medium text-indigo-600 dark:text-teal-200">
+            <span className="text-lg font-medium text-gray-600 dark:text-gray-300">
               {inputFormat || 'Unknown'} to
             </span>
             <div className="relative w-full">
               <select
                 value={outputFormat}
                 onChange={(e) => setOutputFormat(e.target.value)}
-                className="select-field appearance-none bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500 pr-10 transition-all duration-300 w-full"
+                className="select-field appearance-none bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500 pr-10 transition-all duration-300 w-full"
               >
                 {availableFormats.map((format) => (
                   <option key={format} value={format}>
@@ -196,12 +196,12 @@ export default function FormatSelection({
               </select>
               <ChevronDown
                 size={18}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-indigo-700 dark:text-teal-300 pointer-events-none"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-300 pointer-events-none"
               />
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-indigo-600 dark:text-teal-200">
+            <label className="text-sm font-medium text-gray-600 dark:text-gray-300">
               Quality: {Math.round(quality * 100)}%
             </label>
             <input
@@ -211,14 +211,14 @@ export default function FormatSelection({
               step="0.1"
               value={quality}
               onChange={(e) => setQuality(parseFloat(e.target.value))}
-              className="w-full accent-indigo-500 dark:accent-teal-500"
+              className="w-full accent-teal-500"
             />
           </div>
         </div>
         <div className="flex flex-col gap-4">
           <div className="flex gap-4">
             <div className="flex-1">
-              <label className="text-sm font-medium text-indigo-600 dark:text-teal-200">
+              <label className="text-sm font-medium text-gray-600 dark:text-gray-300">
                 Width (px):
               </label>
               <input
@@ -226,11 +226,11 @@ export default function FormatSelection({
                 value={width}
                 onChange={(e) => setWidth(e.target.value)}
                 placeholder="Optional"
-                className="input-field mt-1 bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300"
+                className="input-field mt-1"
               />
             </div>
             <div className="flex-1">
-              <label className="text-sm font-medium text-indigo-600 dark:text-teal-200">
+              <label className="text-sm font-medium text-gray-600 dark:text-gray-300">
                 Height (px):
               </label>
               <input
@@ -238,29 +238,29 @@ export default function FormatSelection({
                 value={height}
                 onChange={(e) => setHeight(e.target.value)}
                 placeholder="Optional"
-                className="input-field mt-1 bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300"
+                className="input-field mt-1"
               />
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-indigo-600 dark:text-teal-200">
+            <label className="text-sm font-medium text-gray-600 dark:text-gray-300">
               Grayscale:
             </label>
             <input
               type="checkbox"
               checked={grayscale}
               onChange={(e) => setGrayscale(e.target.checked)}
-              className="checkbox mt-1 accent-indigo-500 dark:accent-teal-500"
+              className="mt-1 accent-teal-500"
             />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-indigo-600 dark:text-teal-200">
+            <label className="text-sm font-medium text-gray-600 dark:text-gray-300">
               Rotation:
             </label>
             <select
               value={rotation}
               onChange={(e) => setRotation(parseInt(e.target.value))}
-              className="select-field bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300"
+              className="select-field"
             >
               <option value={0}>0°</option>
               <option value={90}>90°</option>
@@ -272,13 +272,13 @@ export default function FormatSelection({
       </div>
       {/* Watermark Section */}
       <div className="flex flex-col gap-2 mb-6">
-        <label className="text-sm font-medium text-indigo-600 dark:text-teal-200">
+        <label className="text-sm font-medium text-gray-600 dark:text-gray-300">
           Watermark:
         </label>
         <select
           value={watermark.type}
           onChange={(e) => setWatermark({ ...watermark, type: e.target.value })}
-          className="select-field bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300"
+          className="select-field"
         >
           <option value="none">None</option>
           <option value="text">Text Watermark</option>
@@ -291,12 +291,12 @@ export default function FormatSelection({
               value={watermark.text}
               onChange={(e) => setWatermark({ ...watermark, text: e.target.value })}
               placeholder="Enter watermark text"
-              className="input-field mt-1 bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300"
+              className="input-field mt-1"
             />
             <select
               value={watermark.position}
               onChange={(e) => setWatermark({ ...watermark, position: e.target.value })}
-              className="select-field bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300"
+              className="select-field"
             >
               <option value="top-left">Top Left</option>
               <option value="top-right">Top Right</option>
@@ -311,19 +311,19 @@ export default function FormatSelection({
               type="file"
               accept="image/*"
               onChange={handleWatermarkImageChange}
-              className="w-full mt-1 text-indigo-700 dark:text-teal-300"
+              className="w-full mt-1 text-gray-600 dark:text-gray-300"
             />
             {watermark.image && (
               <img
                 src={URL.createObjectURL(watermark.image)}
                 alt="Watermark Preview"
-                className="w-24 h-24 object-contain mt-2 rounded-lg border border-indigo-200 dark:border-gray-700"
+                className="w-24 h-24 object-contain mt-2 rounded-lg border border-gray-200 dark:border-gray-700"
               />
             )}
             <select
               value={watermark.position}
               onChange={(e) => setWatermark({ ...watermark, position: e.target.value })}
-              className="select-field bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300"
+              className="select-field"
             >
               <option value="top-left">Top Left</option>
               <option value="top-right">Top Right</option>
@@ -334,7 +334,7 @@ export default function FormatSelection({
         )}
       </div>
       <button
-        className="mt-6 w-full py-3 bg-teal-500 text-white font-semibold rounded-lg shadow-lg hover:bg-teal-600 transition-all duration-300 transform hover:scale-105"
+        className="btn-primary w-full"
         onClick={handleConvertClick}
       >
         Convert Now
