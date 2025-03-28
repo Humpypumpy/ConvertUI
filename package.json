@@ -9,7 +9,9 @@
   },
   "dependencies": {
     "browser-image-compression": "^2.0.2",
+    "file-saver": "^2.0.5",
     "framer-motion": "^12.6.2",
+    "jszip": "^3.10.1",
     "lucide-react": "^0.484.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
