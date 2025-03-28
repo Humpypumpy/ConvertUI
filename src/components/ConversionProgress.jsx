@@ -136,20 +136,20 @@ export default function ConversionProgress({
 
   return (
     <div className="card w-full flex flex-col items-center">
-      <h2 className="text-2xl font-semibold text-center text-indigo-800 dark:text-white mb-4">
+      <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-gray-100 mb-4">
         Converting...
       </h2>
       <div className="w-24 h-24 border-8 border-t-teal-500 rounded-full animate-spin" />
-      <p className="mt-6 text-lg font-medium text-indigo-800 dark:text-white">
+      <p className="mt-6 text-lg font-medium text-gray-800 dark:text-gray-100">
         Converting {files.length} image(s) from {inputFormat} to {outputFormat || 'Unknown'}...
       </p>
-      <div className="w-full bg-gray-200 rounded-full h-2.5 mt-4">
+      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mt-4">
         <div
           className="bg-teal-500 h-2.5 rounded-full transition-all duration-300"
           style={{ width: `${progress}%` }}
         ></div>
       </div>
-      <p className="mt-2 text-sm text-indigo-600 dark:text-teal-200">
+      <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
         {Math.round(progress)}% Complete
       </p>
       <button
