@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import Cropper from 'react-easy-crop';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function FormatSelection({
   files,
@@ -26,10 +27,10 @@ export default function FormatSelection({
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [isCropping, setIsCropping] = useState(false);
-  const [watermarkType, setWatermarkType] = useState('none'); // 'none', 'text', or 'image'
+  const [watermarkType, setWatermarkType] = useState('none');
   const [watermarkText, setWatermarkText] = useState('');
   const [watermarkImage, setWatermarkImage] = useState(null);
-  const [watermarkPosition, setWatermarkPosition] = useState('bottom-right'); // 'top-left', 'top-right', 'bottom-left', 'bottom-right'
+  const [watermarkPosition, setWatermarkPosition] = useState('bottom-right');
 
   const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
     setCroppedAreaPixels(croppedAreaPixels);
@@ -86,7 +87,6 @@ export default function FormatSelection({
   };
 
   const handleConvertClick = () => {
-    // Pass watermark settings to the next step
     setStep('convert', {
       watermark: {
         type: watermarkType,
@@ -109,19 +109,19 @@ export default function FormatSelection({
         <button
           onClick={() => setCurrentFileIndex((prev) => Math.max(prev - 1, 0))}
           disabled={currentFileIndex === 0}
-          className="py-2 px-4 bg-indigo-500 text-white rounded-lg disabled:bg-gray-400"
+          className="p-2 bg-indigo-500 text-white rounded-full disabled:bg-gray-400 hover:bg-indigo-600 transition-all duration-300"
         >
-          Previous
+          <ChevronLeft size={20} />
         </button>
-        <span className="text-indigo-600 dark:text-teal-200">
+        <span className="text-indigo-600 dark:text-teal-200 font-medium">
           Image {currentFileIndex + 1} of {files.length}
         </span>
         <button
           onClick={() => setCurrentFileIndex((prev) => Math.min(prev + 1, files.length - 1))}
           disabled={currentFileIndex === files.length - 1}
-          className="py-2 px-4 bg-indigo-500 text-white rounded-lg disabled:bg-gray-400"
+          className="p-2 bg-indigo-500 text-white rounded-full disabled:bg-gray-400 hover:bg-indigo-600 transition-all duration-300"
         >
-          Next
+          <ChevronRight size={20} />
         </button>
       </div>
       {/* Image Preview and Cropping */}
@@ -130,47 +130,57 @@ export default function FormatSelection({
           <p className="text-sm font-medium text-indigo-600 dark:text-teal-200 mb-2">
             {files[currentFileIndex].original.name}
           </p>
-          {isCropping ? (
-            <div className="relative w-full h-64">
-              <Cropper
-                image={files[currentFileIndex].previewUrl}
-                crop={crop}
-                zoom={zoom}
-                aspect={4 / 3}
-                onCropChange={setCrop}
-                onZoomChange={setZoom}
-                onCropComplete={onCropComplete}
-              />
-              <div className="mt-4 flex gap-4">
-                <button
-                  className="py-2 px-4 bg-teal-500 text-white rounded-lg"
-                  onClick={handleCrop}
-                >
-                  Crop
-                </button>
-                <button
-                  className="py-2 px-4 bg-red-500 text-white rounded-lg"
-                  onClick={() => setIsCropping(false)}
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          ) : (
-            <>
-              <img
-                src={files[currentFileIndex].cropped ? URL.createObjectURL(files[currentFileIndex].cropped) : files[currentFileIndex].previewUrl}
-                alt="Preview"
-                className="w-full h-48 object-contain rounded-lg"
-              />
-              <button
-                className="mt-2 py-2 px-4 bg-indigo-500 text-white rounded-lg"
-                onClick={() => setIsCropping(true)}
-              >
-                Crop Image
-              </button>
-            </>
-          )}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentFileIndex}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              {isCropping ? (
+                <div className="relative w-full h-64">
+                  <Cropper
+                    image={files[currentFileIndex].previewUrl}
+                    crop={crop}
+                    zoom={zoom}
+                    aspect={4 / 3}
+                    onCropChange={setCrop}
+                    onZoomChange={setZoom}
+                    onCropComplete={onCropComplete}
+                  />
+                  <div className="mt-4 flex gap-4">
+                    <button
+                      className="py-2 px-4 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-all duration-300"
+                      onClick={handleCrop}
+                    >
+                      Crop
+                    </button>
+                    <button
+                      className="py-2 px-4 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all duration-300"
+                      onClick={() => setIsCropping(false)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <img
+                    src={files[currentFileIndex].cropped ? URL.createObjectURL(files[currentFileIndex].cropped) : files[currentFileIndex].previewUrl}
+                    alt="Preview"
+                    className="w-full h-48 object-contain rounded-lg border border-indigo-200 dark:border-gray-700"
+                  />
+                  <button
+                    className="mt-2 py-2 px-4 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-all duration-300"
+                    onClick={() => setIsCropping(true)}
+                  >
+                    Crop Image
+                  </button>
+                </>
+              )}
+            </motion.div>
+          </AnimatePresence>
         </div>
       )}
       <div className="flex flex-col gap-4 mb-6">
@@ -182,7 +192,7 @@ export default function FormatSelection({
             <select
               value={outputFormat}
               onChange={(e) => setOutputFormat(e.target.value)}
-              className="appearance-none bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500 pr-10"
+              className="appearance-none bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500 pr-10 transition-all duration-300"
             >
               {availableFormats.map((format) => (
                 <option key={format} value={format}>
@@ -207,7 +217,7 @@ export default function FormatSelection({
             step="0.1"
             value={quality}
             onChange={(e) => setQuality(parseFloat(e.target.value))}
-            className="w-full"
+            className="w-full accent-indigo-500 dark:accent-teal-500"
           />
         </div>
         <div className="flex gap-4">
@@ -220,7 +230,7 @@ export default function FormatSelection({
               value={width}
               onChange={(e) => setWidth(e.target.value)}
               placeholder="Optional"
-              className="w-full mt-1 bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="w-full mt-1 bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300"
             />
           </div>
           <div className="flex-1">
@@ -232,7 +242,7 @@ export default function FormatSelection({
               value={height}
               onChange={(e) => setHeight(e.target.value)}
               placeholder="Optional"
-              className="w-full mt-1 bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="w-full mt-1 bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300"
             />
           </div>
         </div>
@@ -244,7 +254,7 @@ export default function FormatSelection({
             type="checkbox"
             checked={grayscale}
             onChange={(e) => setGrayscale(e.target.checked)}
-            className="mt-1"
+            className="mt-1 accent-indigo-500 dark:accent-teal-500"
           />
         </div>
         <div className="flex flex-col gap-2">
@@ -254,7 +264,7 @@ export default function FormatSelection({
           <select
             value={rotation}
             onChange={(e) => setRotation(parseInt(e.target.value))}
-            className="bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+            className="bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300"
           >
             <option value={0}>0°</option>
             <option value={90}>90°</option>
@@ -270,7 +280,7 @@ export default function FormatSelection({
           <select
             value={watermarkType}
             onChange={(e) => setWatermarkType(e.target.value)}
-            className="bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+            className="bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300"
           >
             <option value="none">None</option>
             <option value="text">Text Watermark</option>
@@ -283,12 +293,12 @@ export default function FormatSelection({
                 value={watermarkText}
                 onChange={(e) => setWatermarkText(e.target.value)}
                 placeholder="Enter watermark text"
-                className="w-full mt-1 bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="w-full mt-1 bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300"
               />
               <select
                 value={watermarkPosition}
                 onChange={(e) => setWatermarkPosition(e.target.value)}
-                className="bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300"
               >
                 <option value="top-left">Top Left</option>
                 <option value="top-right">Top Right</option>
@@ -303,19 +313,19 @@ export default function FormatSelection({
                 type="file"
                 accept="image/*"
                 onChange={handleWatermarkImageChange}
-                className="w-full mt-1"
+                className="w-full mt-1 text-indigo-700 dark:text-teal-300"
               />
               {watermarkImage && (
                 <img
                   src={URL.createObjectURL(watermarkImage)}
                   alt="Watermark Preview"
-                  className="w-24 h-24 object-contain mt-2"
+                  className="w-24 h-24 object-contain mt-2 rounded-lg border border-indigo-200 dark:border-gray-700"
                 />
               )}
               <select
                 value={watermarkPosition}
                 onChange={(e) => setWatermarkPosition(e.target.value)}
-                className="bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="bg-indigo-100 dark:bg-gray-700 text-indigo-700 dark:text-teal-300 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300"
               >
                 <option value="top-left">Top Left</option>
                 <option value="top-right">Top Right</option>
@@ -327,7 +337,7 @@ export default function FormatSelection({
         </div>
       </div>
       <button
-        className="mt-6 w-full py-3 bg-teal-500 text-white font-semibold rounded-lg shadow-lg hover:bg-teal-600 transition-all duration-300"
+        className="mt-6 w-full py-3 bg-teal-500 text-white font-semibold rounded-lg shadow-lg hover:bg-teal-600 transition-all duration-300 transform hover:scale-105"
         onClick={handleConvertClick}
       >
         Convert Now
