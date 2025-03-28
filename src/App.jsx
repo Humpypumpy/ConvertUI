@@ -20,7 +20,7 @@ const supportedFormats = ['JPG', 'PNG', 'HEIC', 'WEBP', 'GIF', 'TIFF', 'AVIF'];
 export default function App() {
   const [step, setStep] = useState('upload');
   const [isDark, setIsDark] = useState(false);
-  const [files, setFiles] = useState([]); // Now an array of file objects
+  const [files, setFiles] = useState([]);
   const [inputFormat, setInputFormat] = useState('');
   const [outputFormat, setOutputFormat] = useState('PNG');
   const [convertedUrls, setConvertedUrls] = useState([]);
@@ -29,6 +29,7 @@ export default function App() {
   const [height, setHeight] = useState('');
   const [grayscale, setGrayscale] = useState(false);
   const [rotation, setRotation] = useState(0);
+  const [watermark, setWatermark] = useState({ type: 'none', text: '', image: null, position: 'bottom-right' });
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', isDark);
@@ -46,6 +47,13 @@ export default function App() {
       setInputFormat(inputFormat);
       setStep('select');
     }
+  };
+
+  const handleSetStep = (newStep, additionalData = {}) => {
+    if (newStep === 'convert') {
+      setWatermark(additionalData.watermark || { type: 'none', text: '', image: null, position: 'bottom-right' });
+    }
+    setStep(newStep);
   };
 
   console.log("App: Current state - step:", step, "files:", files, "convertedUrls:", convertedUrls);
@@ -70,7 +78,7 @@ export default function App() {
                 inputFormat={inputFormat}
                 outputFormat={outputFormat}
                 setOutputFormat={setOutputFormat}
-                setStep={setStep}
+                setStep={handleSetStep}
                 quality={quality}
                 setQuality={setQuality}
                 width={width}
@@ -97,6 +105,7 @@ export default function App() {
                 height={height}
                 grayscale={grayscale}
                 rotation={rotation}
+                watermark={watermark}
               />
             </motion.div>
           )}
