@@ -13,6 +13,7 @@
     "lucide-react": "^0.244.0",
     "postcss": "^8.4.47",
     "react": "^18.2.0",
+    "react-compare-image": "^3.4.0",
     "react-dom": "^18.2.0",
     "react-easy-crop": "^5.0.8",
     "react-hot-toast": "^2.4.1",
