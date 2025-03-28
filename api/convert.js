@@ -41,7 +41,7 @@ export default async function handler(req, res) {
     if (watermark && watermark.type !== 'none') {
       const metadata = await image.metadata();
       const imageWidth = metadata.width;
-      the imageHeight = metadata.height;
+      const imageHeight = metadata.height;
 
       let watermarkBuffer;
       if (watermark.type === 'text') {
