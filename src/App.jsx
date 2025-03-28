@@ -57,7 +57,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 dark:from-gray-900 dark:via-gray-800 dark:to-black text-gray-900 dark:text-white px-4 py-8 flex flex-col items-center relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-500 dark:from-gray-900 dark:to-gray-800 text-gray-900 dark:text-white px-4 py-8 flex flex-col items-center relative overflow-hidden">
       <Header />
       <DarkModeToggle isDark={isDark} setIsDark={setIsDark} />
       <div className="mt-12 w-full max-w-2xl flex flex-col items-center">
@@ -120,7 +120,7 @@ export default function App() {
           )}
         </AnimatePresence>
       </div>
-      <p className="mt-auto text-sm text-indigo-400 dark:text-teal-300 pt-8 font-medium">
+      <p className="mt-auto text-sm text-gray-300 dark:text-gray-400 pt-8 font-medium">
         Built with ❤️ for Telegram Mini Apps
       </p>
     </div>
