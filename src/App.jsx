@@ -59,10 +59,10 @@ export default function App() {
   console.log("App: Current state - step:", step, "files:", files, "convertedUrls:", convertedUrls);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-white dark:from-gray-900 dark:to-black text-gray-900 dark:text-white px-6 py-8 flex flex-col items-center relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 dark:from-gray-900 dark:via-gray-800 dark:to-black text-gray-900 dark:text-white px-4 py-8 flex flex-col items-center relative overflow-hidden">
       <DarkModeToggle isDark={isDark} setIsDark={setIsDark} />
       <Header />
-      <div className="mt-10 w-full max-w-md flex flex-col items-center">
+      <div className="mt-12 w-full max-w-lg flex flex-col items-center">
         <AnimatePresence mode="wait">
           {step === 'upload' && (
             <motion.div key="upload" {...transitionProps} className="w-full">
