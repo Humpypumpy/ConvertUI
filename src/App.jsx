@@ -21,6 +21,8 @@ export default function App() {
   const [step, setStep] = useState('upload');
   const [isDark, setIsDark] = useState(false);
   const [file, setFile] = useState(null);
+  const [grayscale, setGrayscale] = useState(false);
+  const [rotation, setRotation] = useState(0);
   const [inputFormat, setInputFormat] = useState(''); // Will auto-detect
   const [outputFormat, setOutputFormat] = useState('PNG');
   const [convertedUrl, setConvertedUrl] = useState(null);
