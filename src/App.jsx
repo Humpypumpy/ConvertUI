@@ -21,9 +21,12 @@ export default function App() {
   const [step, setStep] = useState('upload');
   const [isDark, setIsDark] = useState(false);
   const [file, setFile] = useState(null);
-  const [inputFormat, setInputFormat] = useState('JPG');
+  const [inputFormat, setInputFormat] = useState(''); // Will auto-detect
   const [outputFormat, setOutputFormat] = useState('PNG');
   const [convertedUrl, setConvertedUrl] = useState(null);
+  const [quality, setQuality] = useState(0.8); // Default quality (0 to 1)
+  const [width, setWidth] = useState(''); // Empty means no resize
+  const [height, setHeight] = useState(''); // Empty means no resize
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', isDark);
@@ -39,7 +42,7 @@ export default function App() {
         <AnimatePresence mode="wait">
           {step === 'upload' && (
             <motion.div key="upload" {...transitionProps} className="w-full">
-              <UploadSection setStep={setStep} setFile={setFile} />
+              <UploadSection setStep={setStep} setFile={setFile} setInputFormat={setInputFormat} />
             </motion.div>
           )}
           {step === 'select' && (
@@ -48,9 +51,14 @@ export default function App() {
                 formats={supportedFormats}
                 inputFormat={inputFormat}
                 outputFormat={outputFormat}
-                setInputFormat={setInputFormat}
                 setOutputFormat={setOutputFormat}
                 setStep={setStep}
+                quality={quality}
+                setQuality={setQuality}
+                width={width}
+                setWidth={setWidth}
+                height={height}
+                setHeight={setHeight}
               />
             </motion.div>
           )}
@@ -59,9 +67,12 @@ export default function App() {
               <ConversionProgress
                 file={file}
                 inputFormat={inputFormat}
-                outputFormat={outputFormat} // Add this
+                outputFormat={outputFormat}
                 setConvertedUrl={setConvertedUrl}
                 setStep={setStep}
+                quality={quality}
+                width={width}
+                height={height}
               />
             </motion.div>
           )}
@@ -69,7 +80,7 @@ export default function App() {
             <motion.div key="result" {...transitionProps} className="w-full">
               <ResultDisplay
                 convertedUrl={convertedUrl}
-                outputFormat={outputFormat} // Add this
+                outputFormat={outputFormat}
                 setStep={setStep}
               />
             </motion.div>
