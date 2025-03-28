@@ -1,7 +1,11 @@
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
 
-export default function FormatSelection({ formats, inputFormat, setInputFormat, outputFormat, setOutputFormat, onConvert }) {
+export default function FormatSelection({ formats, inputFormat, setInputFormat, outputFormat, setOutputFormat, setStep }) { // Use setStep
+  const handleConvertClick = () => {
+    setStep('convert'); // Move to conversion step
+  };
+
   return (
     <div className="w-full bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
       <h2 className="text-xl font-semibold text-center text-indigo-800 dark:text-white mb-4">
@@ -37,7 +41,7 @@ export default function FormatSelection({ formats, inputFormat, setInputFormat, 
       </div>
       <button
         className="mt-6 w-full py-3 bg-teal-500 text-white font-semibold rounded-lg shadow-lg hover:bg-teal-600 transition-all duration-300"
-        onClick={onConvert}
+        onClick={handleConvertClick} // Updated to move to 'convert'
       >
         Convert Now
       </button>
